@@ -10,7 +10,7 @@ const dogapi = require('dogapi')
 
 function lastLogCheckpoint(req, res) {
   let ctx = req.webtaskContext;
-  let required_settings = ['AUTH0_DOMAIN', 'AUTH0_CLIENT_ID', 'AUTH0_CLIENT_SECRET', 'MIXPANEL_TOKEN', 'MIXPANEL_KEY'];
+  let required_settings = ['AUTH0_DOMAIN', 'AUTH0_CLIENT_ID', 'AUTH0_CLIENT_SECRET', 'DATADOG_APIKEY', 'DATADOG_APPKEY'];
   let missing_settings = required_settings.filter((setting) => !ctx.data[setting]);
 
   if (missing_settings.length) {

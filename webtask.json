@@ -28,6 +28,10 @@
       "description": "DataDog Tags (comma separated) to append to all events",
       "required": false
     },
+    "BATCH_SIZE": {
+      "description": "The ammount of logs to be read on each execution. Maximun is 100.",
+      "default": 100
+    },
     "LOG_LEVEL": {
       "description": "This allows you to specify the log level of events that need to be sent",
       "type": "select",
