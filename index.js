@@ -92,7 +92,7 @@ function lastLogCheckpoint(req, res) {
               logTypes[log.type].event,
               JSON.stringify(log),
               {
-                tags: ["auth0", logStages[log.hostname]],
+                tags: ctx.data.DATADOG_TAGS.split(','),
                 alert_type: logLevels[logTypes[log.type].level]
               },
               function(err, res){
@@ -144,11 +144,6 @@ function lastLogCheckpoint(req, res) {
 }
 
 const logLevels = ["debug", "info", "warning", "error", "error"];
-const logStages = {
-  'sothebys.auth0.com': 'prd',
-  'sothebys-stg.auth0.com': 'stg',
-  'sothelabs.auth0.com': 'dev'
-}
 const logTypes = {
   's': {
     event: 'Success Login',
