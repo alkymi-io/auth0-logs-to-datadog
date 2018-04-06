@@ -1,29 +1,17 @@
 {
-  "name": "auth0-logs-to-mixpanel",
+  "name": "auth0-logs-to-dataDog",
   "version": "1.4.1",
-  "description": "This extension will take all of your Auth0 logs and export them to Mixpanel.",
+  "description": "This extension will take all of your Auth0 logs and export them to DataDog.",
   "main": "index.js",
   "scripts": {
     "build": "webpack"
   },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/auth0/auth0-logs-to-mixpanel.git"
-  },
-  "author": "richard.seldon@auth0.com",
-  "license": "MIT",
-  "bugs": {
-    "url": "https://github.com/auth0/auth0-logs-to-mixpanel/issues"
-  },
-  "homepage": "https://github.com/auth0/auth0-logs-to-mixpanel#readme",
   "dependencies": {
     "async": "1.0.0",
     "express": "4.14.0",
     "json-stringify-safe": "^5.0.1",
     "lru-memoizer": "^1.2.0",
-    "mixpanel": "^0.4.0",
-    "moment": "2.11.2",
-    "useragent": "2.1.6",
+    "dogapi": "2.8.0",
     "webtask-tools": "^1.3.0",
     "request": "^2.56.0"
   },

@@ -1,11 +1,11 @@
 {
-  "title": "Auth0 Logs to Mixpanel",
-  "name": "auth0-logs-to-mixpanel",
+  "title": "Auth0 Logs to DataDog",
+  "name": "auth0-logs-to-datadog",
   "version": "1.4.0",
   "author": "auth0",
-  "description": "This extension will take all of your Auth0 logs and export them to Mixpanel",
+  "description": "This extension will take all of your Auth0 logs and export them to DataDog",
   "type": "cron",
-  "repository": "https://github.com/auth0/auth0-logs-to-mixpanel",
+  "repository": "https://github.com/auth0/auth0-logs-to-datadog",
   "keywords": [
     "auth0",
     "extension"
@@ -15,14 +15,18 @@
     "scopes": "read:logs"
   },
   "secrets": {
-    "MIXPANEL_TOKEN": {
-      "description": "Mixpanel Token - this is your Mixpanel Token for your mixpanel project",
+    "DATADOG_APIKEY": {
+      "description": "DataDog API Key - this is your DataDog API Key",
       "required": true
     },
-    "MIXPANEL_KEY": {
-      "description": "Mixpanel Key - this is your Mixpanel Key for your mixpanel project",
+    "DATADOG_APPKEY": {
+      "description": "DataDog App Key - this is your DataDog App Key",
       "required": true,
       "type": "password"
+    },
+    "DATADOG_TAGS": {
+      "description": "DataDog Tags (comma separated) to append to all events",
+      "required": false
     },
     "BATCH_SIZE": {
       "description": "The ammount of logs to be read on each execution. Maximun is 100.",

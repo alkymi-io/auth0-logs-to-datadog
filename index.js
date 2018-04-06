@@ -1,18 +1,16 @@
 'use strict';
 
 const async = require('async');
-const moment = require('moment');
-const useragent = require('useragent');
 const express = require('express');
 const Webtask = require('webtask-tools');
 const app = express();
-const Mixpanel = require('mixpanel');
 const Request = require('request');
 const memoizer = require('lru-memoizer');
+const dogapi = require('dogapi')
 
 function lastLogCheckpoint(req, res) {
   let ctx = req.webtaskContext;
-  let required_settings = ['AUTH0_DOMAIN', 'AUTH0_CLIENT_ID', 'AUTH0_CLIENT_SECRET', 'MIXPANEL_TOKEN', 'MIXPANEL_KEY'];
+  let required_settings = ['AUTH0_DOMAIN', 'AUTH0_CLIENT_ID', 'AUTH0_CLIENT_SECRET', 'DATADOG_APIKEY', 'DATADOG_APPKEY'];
   let missing_settings = required_settings.filter((setting) => !ctx.data[setting]);
 
   if (missing_settings.length) {
@@ -28,14 +26,10 @@ function lastLogCheckpoint(req, res) {
     }
 
     // Create a new event logger
-    const Logger = Mixpanel.init(ctx.data.MIXPANEL_TOKEN, {
-      key: ctx.data.MIXPANEL_KEY
+    dogapi.initialize({
+      api_key: ctx.data.DATADOG_APIKEY,
+      app_key: ctx.data.DATADOG_APPKEY
     });
-
-    Logger.error = function (err, context) {
-      // Handle errors here
-      console.log("error", err, "context", context);
-    };
 
     // Start the process.
     async.waterfall([
@@ -91,35 +85,29 @@ function lastLogCheckpoint(req, res) {
         callback(null, context);
       },
       (context, callback) => {
-        console.log(`Sending ${context.logs.length}`);
-        if (context.logs.length > 0) {
-          const now = Date.now();
-          const mixpanelEvents = context.logs.map(function (log) {
-            const eventName = logTypes[log.type].event;
-            // TODO - consider setting the time to date in the underlying log file?
-            // log.time = log.date;
-            log.time = now;
-            log.distinct_id = 'auth0-logs';
-            return {
-              event: eventName,
-              properties: log
-            };
-          });
+        console.log('Uploading blobs...');
 
-          // import all events at once
-          Logger.import_batch(mixpanelEvents, function(errorList) {
-            if (errorList && errorList.length > 0) {
-              console.log('Errors occurred sending logs to Mixpanel:', JSON.stringify(errorList));
-              return callback(errorList);
+          async.eachLimit(context.logs, 5, (log, cb) => {
+            dogapi.event.create(
+              logTypes[log.type].event,
+              JSON.stringify(log),
+              {
+                tags: ctx.data.DATADOG_TAGS.split(','),
+                alert_type: logLevels[logTypes[log.type].level]
+              },
+              function(err, res){
+                console.dir(res);
+              }
+            );
+
+          }, (err) => {
+            if (err) {
+              return callback(err);
             }
+
             console.log('Upload complete.');
             return callback(null, context);
           });
-        } else {
-          // no logs, just callback
-          console.log('No logs to upload - completed.');
-          return callback(null, context);
-        }
       }
     ], function (err, context) {
       if (err) {
@@ -155,6 +143,7 @@ function lastLogCheckpoint(req, res) {
   });
 }
 
+const logLevels = ["debug", "info", "warning", "error", "error"];
 const logTypes = {
   's': {
     event: 'Success Login',
@@ -421,7 +410,3 @@ app.get('/', lastLogCheckpoint);
 app.post('/', lastLogCheckpoint);
 
 module.exports = Webtask.fromExpress(app);
-
-
-
-
